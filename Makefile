@@ -8,19 +8,24 @@ CXXFLAGS := -v -g -O2
 NVCFLAGS := -v -g -G -O2
 LDFLAGS  := -v -g -G
 
+INCLUDE := -Iinclude/
+
+EXECNAME := cuda-magnetic-pendulum
+OBJFILES := src/main.o src/kern.o src/kern_impl.o src/kern_gpu.o
+
 
 .PHONY : all clean
 
-all : prog
+all : $(EXECNAME)
 
 clean :
-	rm -rfv prog *.o
+	rm -rfv $(EXECNAME) $(OBJFILES)
 
 
-prog : main.o kern.o kern_impl.o kern_gpu.o
+$(EXECNAME) : $(OBJFILES)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $^
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c -o $@ $^
 %.o : %.cu
-	$(NVCC) $(NVCFLAGS) -c -o $@ $^
+	$(NVCC) $(NVCFLAGS) $(INCLUDE) -c -o $@ $^

@@ -1,0 +1,3 @@
+# Ignore object files and the final executable
+**/*.o
+**/cuda-magnetic-pendulum
