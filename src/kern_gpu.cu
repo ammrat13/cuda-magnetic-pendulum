@@ -31,8 +31,8 @@ __global__ void kern::gpu::compute_gpu(
         return;
     }
 
-    float rowA = (float) rowIdx / (float) p.resolution;
-    float colA = (float) colIdx / (float) p.resolution;
+    float rowA = ((float) rowIdx + 0.5) / (float) p.resolution;
+    float colA = ((float) colIdx + 0.5) / (float) p.resolution;
 
     float4 state = make_float4(
         (1-colA)*p.top_corner.x + colA*p.bot_corner.x,
