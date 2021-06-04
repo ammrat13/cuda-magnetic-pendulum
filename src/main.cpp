@@ -4,7 +4,9 @@
 #include "kern.h"
 
 
-const size_t RES = 2048;
+const size_t RES   = 500;
+const size_t ITERS = 10000;
+const float H      = 0.002;
 
 bool color_func(kern::StateElem e) {
     return e.pos.y < 0;
@@ -18,7 +20,7 @@ int main() {
     out << "P1" << std::endl;
     out << RES << " " << RES << std::endl;
 
-    kern::Kern kernel{ RES, {0.0, 1.0}, {1.0, 0.0} };
+    kern::Kern kernel{ { RES, ITERS, H, {0.0, 1.0}, {1.0, 0.0} } };
     std::unique_ptr<const kern::StateElem[]> ret = kernel.getState();
 
     for(size_t r = 0; r < RES; r++) {

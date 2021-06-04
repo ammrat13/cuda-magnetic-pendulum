@@ -6,7 +6,7 @@
 
 namespace kern::gpu {
 
-    __global__ void compute_gpu(RawState st, size_t resolution, Vec2D top, Vec2D bot);
+    __global__ void compute_gpu(RawState st, Params p);
     __device__ float4 state_dt(float4 state);
 
     namespace dts {

@@ -1,10 +1,6 @@
 #include "kern_gpu.cuh"
 
 
-__device__ const unsigned int ITERS = 200000;
-__device__ const float STEP = .0002;
-
-
 __device__ inline float4 operator*(const float& a, const float4& b) {
     return make_float4(
         a*b.x,
@@ -26,33 +22,32 @@ __device__ inline float4 operator+(const float4& a, const float4& b) {
 
 __global__ void kern::gpu::compute_gpu(
     kern::RawState st,
-    size_t resolution,
-    kern::Vec2D top,
-    kern::Vec2D bot
+    kern::Params p
 ) {
 
     unsigned int rowIdx = blockIdx.y;
     unsigned int colIdx = blockIdx.x*blockDim.x + threadIdx.x;
-    if(colIdx >= resolution) {
+    if(colIdx >= p.resolution) {
         return;
     }
 
-    float rowA = (float) rowIdx / (float) resolution;
-    float colA = (float) colIdx / (float) resolution;
+    float rowA = (float) rowIdx / (float) p.resolution;
+    float colA = (float) colIdx / (float) p.resolution;
 
     float4 state = make_float4(
-        (1-colA)*top.x + colA*bot.x,
-        (1-rowA)*top.y + rowA*bot.y,
+        (1-colA)*p.top_corner.x + colA*p.bot_corner.x,
+        (1-rowA)*p.top_corner.y + rowA*p.bot_corner.y,
         0.0,
         0.0
     );
 
-    for(unsigned int i = 0; i < ITERS; i++) {
+    const float h = p.step_size;
+    for(unsigned int i = 0; i < p.iterations; i++) {
         float4 k1 = kern::gpu::state_dt(state);
-        float4 k2 = kern::gpu::state_dt(state + STEP/2 * k1);
-        float4 k3 = kern::gpu::state_dt(state + STEP/2 * k2);
-        float4 k4 = kern::gpu::state_dt(state + STEP * k3);
-        state = state + STEP/6 * (k1 + 2*k2 + 2*k3 + k4);
+        float4 k2 = kern::gpu::state_dt(state + h/2 * k1);
+        float4 k3 = kern::gpu::state_dt(state + h/2 * k2);
+        float4 k4 = kern::gpu::state_dt(state + h * k3);
+        state = state + h/6 * (k1 + 2*k2 + 2*k3 + k4);
     }
 
     st.data[rowIdx * st.pitch/sizeof(float4) + colIdx] = state;

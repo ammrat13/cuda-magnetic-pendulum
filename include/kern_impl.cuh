@@ -16,17 +16,14 @@ namespace kern {
 
         public:
 
-            KernImpl(size_t res, Vec2D top, Vec2D bot);
+            KernImpl(Params p);
             ~KernImpl();
 
-            std::unique_ptr<const StateElem[]> getState() const;
+            std::unique_ptr<const State> getState() const;
 
         private:
 
-            const size_t resolution;
-            const size_t pixels;
-            const Vec2D top_corner;
-            const Vec2D bot_corner;
+            const Params p;
 
             RawState hos_state;
             RawState dev_state;

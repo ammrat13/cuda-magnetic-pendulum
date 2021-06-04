@@ -14,16 +14,30 @@ namespace kern {
         float y;
     };
 
+
+    struct Params {
+        const size_t resolution;
+        const size_t iterations;
+        const float step_size;
+
+        const Vec2D top_corner;
+        const Vec2D bot_corner;
+
+        size_t pixels() const { return this->resolution * this->resolution; };
+    };
+
     struct StateElem {
         Vec2D pos;
         Vec2D vel;
     };
+    using State = StateElem[];
+
 
     class Kern {
         public:
-            Kern(size_t res, Vec2D top, Vec2D bot);
+            Kern(Params p);
             ~Kern();
-            std::unique_ptr<const StateElem[]> getState() const;
+            std::unique_ptr<const State> getState() const;
         private:
             class KernImpl;
             const std::unique_ptr<KernImpl> kern_impl;

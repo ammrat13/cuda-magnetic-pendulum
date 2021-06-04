@@ -2,21 +2,16 @@
 #include "kern_gpu.cuh"
 
 
-kern::Kern::KernImpl::KernImpl(size_t res, Vec2D top, Vec2D bot):
-    resolution{res},
-    pixels{res*res},
-    top_corner{top},
-    bot_corner{bot}
-{
+kern::Kern::KernImpl::KernImpl(kern::Params p): p{p} {
 
-    this->hos_state.pitch = this->resolution * sizeof(float4);
-    this->hos_state.data = new float4[this->pixels];
+    this->hos_state.pitch = this->p.resolution * sizeof(float4);
+    this->hos_state.data = new float4[this->p.pixels()];
 
     cudaError_t alloc_res = cudaMallocPitch(
         &this->dev_state.data,
         &this->dev_state.pitch,
-        this->resolution * sizeof(float4),
-        this->resolution
+        this->p.resolution * sizeof(float4),
+        this->p.resolution
     );
     if(alloc_res != cudaSuccess) {
         throw;
@@ -33,12 +28,16 @@ kern::Kern::KernImpl::~KernImpl() {
 
 std::unique_ptr<const kern::StateElem[]> kern::Kern::KernImpl::getState() const {
 
-    std::unique_ptr<kern::StateElem[]> ret(new kern::StateElem[this->pixels]);
+    std::unique_ptr<kern::StateElem[]> ret(
+        new kern::StateElem[this->p.pixels()]
+    );
 
-    for(size_t r = 0; r < this->resolution; r++) {
-        for(size_t c = 0; c < this->resolution; c++) {
-            float4 cur = this->hos_state.data[r * this->hos_state.pitch/sizeof(float4) + c];
-            ret[r * this->resolution + c] = {
+    for(size_t r = 0; r < this->p.resolution; r++) {
+        for(size_t c = 0; c < this->p.resolution; c++) {
+            float4 cur = this->hos_state.data[
+                r * this->hos_state.pitch/sizeof(float4) + c
+            ];
+            ret[r * this->p.resolution + c] = {
                 {cur.x, cur.y},
                 {cur.z, cur.w}
             };
@@ -50,15 +49,18 @@ std::unique_ptr<const kern::StateElem[]> kern::Kern::KernImpl::getState() const 
 
 
 void kern::Kern::KernImpl::compute() {
-    const size_t parallelism = 32;
+    const size_t parallelism = 256;
 
-    const dim3 num_blocks(this->resolution/parallelism + 1, this->resolution, 1);
+    const dim3 num_blocks(
+        (this->p.resolution + parallelism - 1) / parallelism,
+        this->p.resolution,
+        1
+    );
     const dim3 th_per_blk(parallelism, 1, 1);
 
     kern::gpu::compute_gpu<<<num_blocks, th_per_blk>>>(
         this->dev_state,
-        this->resolution,
-        this->top_corner, this->bot_corner
+        this->p
     );
 
     cudaError_t memcpy_res = cudaMemcpy2D(
@@ -66,8 +68,8 @@ void kern::Kern::KernImpl::compute() {
         this->hos_state.pitch,
         this->dev_state.data,
         this->dev_state.pitch,
-        this->resolution * sizeof(float4),
-        this->resolution,
+        this->p.resolution * sizeof(float4),
+        this->p.resolution,
         cudaMemcpyDeviceToHost
     );
     if(memcpy_res != cudaSuccess) {

@@ -1,3 +1,6 @@
 # Ignore object files and the final executable
 **/*.o
 **/cuda-magnetic-pendulum
+
+# Ignore generated images
+*.pbm
