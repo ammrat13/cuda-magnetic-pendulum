@@ -17,7 +17,6 @@ namespace kern {
 
     struct Params {
         const size_t resolution;
-        const size_t iterations;
         const float step_size;
 
         const Vec2D top_corner;
@@ -35,9 +34,13 @@ namespace kern {
 
     class Kern {
         public:
+
             Kern(Params p);
             ~Kern();
+
+            void compute(size_t iters);
             std::unique_ptr<const State> getState() const;
+
         private:
             class KernImpl;
             const std::unique_ptr<KernImpl> kern_impl;

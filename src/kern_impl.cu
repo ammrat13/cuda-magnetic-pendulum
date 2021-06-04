@@ -2,7 +2,7 @@
 #include "kern_gpu.cuh"
 
 
-kern::Kern::KernImpl::KernImpl(kern::Params p): p{p} {
+kern::Kern::KernImpl::KernImpl(kern::Params p): p{p}, first_call{true} {
 
     this->hos_state.pitch = this->p.resolution * sizeof(float4);
     this->hos_state.data = new float4[this->p.pixels()];
@@ -16,8 +16,6 @@ kern::Kern::KernImpl::KernImpl(kern::Params p): p{p} {
     if(alloc_res != cudaSuccess) {
         throw;
     }
-
-    this->compute();
 }
 
 kern::Kern::KernImpl::~KernImpl() {
@@ -48,7 +46,7 @@ std::unique_ptr<const kern::StateElem[]> kern::Kern::KernImpl::getState() const 
 }
 
 
-void kern::Kern::KernImpl::compute() {
+void kern::Kern::KernImpl::compute(size_t iters) {
     const size_t parallelism = 256;
 
     const dim3 num_blocks(
@@ -60,7 +58,9 @@ void kern::Kern::KernImpl::compute() {
 
     kern::gpu::compute_gpu<<<num_blocks, th_per_blk>>>(
         this->dev_state,
-        this->p
+        this->p,
+        iters,
+        this->first_call
     );
 
     cudaError_t memcpy_res = cudaMemcpy2D(
@@ -75,4 +75,6 @@ void kern::Kern::KernImpl::compute() {
     if(memcpy_res != cudaSuccess) {
         throw;
     }
+
+    this->first_call = false;
 }

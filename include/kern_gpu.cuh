@@ -6,7 +6,11 @@
 
 namespace kern::gpu {
 
-    __global__ void compute_gpu(RawState st, Params p);
+    __global__ void compute_gpu(
+        RawState st,
+        Params p,
+        unsigned int iters,
+        bool first_call);
     __device__ float4 state_dt(float4 state);
 
     namespace dts {

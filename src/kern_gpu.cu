@@ -22,7 +22,9 @@ __device__ inline float4 operator+(const float4& a, const float4& b) {
 
 __global__ void kern::gpu::compute_gpu(
     kern::RawState st,
-    kern::Params p
+    kern::Params p,
+    unsigned int iters,
+    bool first_call
 ) {
 
     unsigned int rowIdx = blockIdx.y;
@@ -34,15 +36,15 @@ __global__ void kern::gpu::compute_gpu(
     float rowA = ((float) rowIdx + 0.5) / (float) p.resolution;
     float colA = ((float) colIdx + 0.5) / (float) p.resolution;
 
-    float4 state = make_float4(
-        (1-colA)*p.top_corner.x + colA*p.bot_corner.x,
-        (1-rowA)*p.top_corner.y + rowA*p.bot_corner.y,
-        0.0,
-        0.0
-    );
+    float4 state = first_call
+        ? make_float4(
+            (1-colA)*p.top_corner.x + colA*p.bot_corner.x,
+            (1-rowA)*p.top_corner.y + rowA*p.bot_corner.y,
+            0.0, 0.0)
+        : st.data[rowIdx * st.pitch/sizeof(float4) + colIdx];
 
     const float h = p.step_size;
-    for(unsigned int i = 0; i < p.iterations; i++) {
+    for(unsigned int i = 0; i < iters; i++) {
         float4 k1 = kern::gpu::state_dt(state);
         float4 k2 = kern::gpu::state_dt(state + h/2 * k1);
         float4 k3 = kern::gpu::state_dt(state + h/2 * k2);

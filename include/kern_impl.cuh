@@ -19,16 +19,16 @@ namespace kern {
             KernImpl(Params p);
             ~KernImpl();
 
+            void compute(size_t iters);
             std::unique_ptr<const State> getState() const;
 
         private:
 
             const Params p;
+            bool first_call;
 
             RawState hos_state;
             RawState dev_state;
-
-            void compute();
 
     };
 }

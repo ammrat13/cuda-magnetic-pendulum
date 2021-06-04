@@ -20,7 +20,8 @@ int main() {
     out << "P1" << std::endl;
     out << RES << " " << RES << std::endl;
 
-    kern::Kern kernel{ { RES, ITERS, H, {0.0, 1.0}, {1.0, 0.0} } };
+    kern::Kern kernel{ { RES, H, {0.0, 1.0}, {1.0, 0.0} } };
+    kernel.compute(ITERS);
     std::unique_ptr<const kern::StateElem[]> ret = kernel.getState();
 
     for(size_t r = 0; r < RES; r++) {
