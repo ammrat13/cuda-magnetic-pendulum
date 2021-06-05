@@ -4,9 +4,9 @@
 #include "img.h"
 
 
-const size_t RES   = 2048;
-const size_t ITERS = 250000;
-const float  H     = 0.0001;
+const size_t RES   = 4096;
+const size_t ITERS = 50000;
+const float  H     = 0.0005;
 
 const kern::Vec2D TOP_CORNER = {0.0, 1.0};
 const kern::Vec2D BOT_CORNER = {1.0, 0.0};
