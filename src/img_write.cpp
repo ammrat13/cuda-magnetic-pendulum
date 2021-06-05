@@ -1,4 +1,5 @@
 #include "img.h"
+#include <iostream>
 
 
 void img::write::pbm(
@@ -15,7 +16,10 @@ void img::write::pbm(
     for(size_t r = 0; r < p.resolution; r++) {
         for(size_t c = 0; c < p.resolution; c++) {
             img::Color res = cf(s(r, c));
-            file << res.r << " " << res.g << " " << res.b << "\n";
+            file
+                << std::to_string(res.r) << " "
+                << std::to_string(res.g) << " "
+                << std::to_string(res.b) << "\n";
         }
     }
 
