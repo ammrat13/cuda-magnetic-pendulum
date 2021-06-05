@@ -3,12 +3,15 @@
 #include "kern.h"
 #include "img.h"
 
+
 const size_t RES   = 500;
 const size_t ITERS = 100000;
 const float H      = 0.002;
 
 const kern::Vec2D TOP_CORNER = {0.0, 1.0};
 const kern::Vec2D BOT_CORNER = {1.0, 0.0};
+
+const std::string OUT_FILE_NAME = "out.pbm";
 
 
 int main() {
@@ -21,7 +24,7 @@ int main() {
 
 
     std::ofstream out;
-    out.open("out.pbm", std::ios::out | std::ios::trunc);
+    out.open(OUT_FILE_NAME, std::ios::out | std::ios::trunc);
 
     img::write::pbm(out, params, result.get(), img::color_funcs::sign_y);
 }
