@@ -1,33 +1,27 @@
-#include <iostream>
 #include <fstream>
 
 #include "kern.h"
-
+#include "img.h"
 
 const size_t RES   = 500;
 const size_t ITERS = 10000;
 const float H      = 0.002;
 
-bool color_func(kern::StateElem e) {
-    return e.pos.y < 0;
-}
+const kern::Vec2D TOP_CORNER = {0.0, 1.0};
+const kern::Vec2D BOT_CORNER = {1.0, 0.0};
+
 
 int main() {
+
+    kern::Params params = { RES, H, TOP_CORNER, BOT_CORNER };
+    kern::Kern kernel{ params };
+
+    kernel.compute(ITERS);
+    std::unique_ptr<const kern::State> result = kernel.getState();
+
 
     std::ofstream out;
     out.open("out.pbm", std::ios::out | std::ios::trunc);
 
-    out << "P1" << std::endl;
-    out << RES << " " << RES << std::endl;
-
-    kern::Kern kernel{ { RES, H, {0.0, 1.0}, {1.0, 0.0} } };
-    kernel.compute(ITERS);
-    std::unique_ptr<const kern::StateElem[]> ret = kernel.getState();
-
-    for(size_t r = 0; r < RES; r++) {
-        for(size_t c = 0; c < RES; c++) {
-            out << color_func(ret[r*RES + c]) << " ";
-        }
-        out << std::endl;
-    }
+    img::write::pbm(out, params, result.get(), img::color_funcs::sign_y);
 }

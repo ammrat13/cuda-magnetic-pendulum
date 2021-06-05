@@ -11,7 +11,9 @@ LDFLAGS  := -v -g -G
 INCLUDE := -Iinclude/
 
 EXECNAME := cuda-magnetic-pendulum
-OBJFILES := src/main.o src/kern.o src/kern_impl.o src/kern_gpu.o
+OBJFILES := src/main.o \
+	src/kern.o src/kern_impl.o src/kern_gpu.o \
+	src/img_color.o src/img_write.o
 
 
 .PHONY : all clean
