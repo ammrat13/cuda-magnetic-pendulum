@@ -3,9 +3,9 @@ CXX  := g++
 NVCC := nvcc
 LD   := nvcc
 
-CFLAGS   := -v -O2
-CXXFLAGS := -v -O2
-NVCFLAGS := -v -O2
+CFLAGS   := -v -O2 -Wall -Werror
+CXXFLAGS := -v -O2 -Wall -Werror
+NVCFLAGS := -v -O2 -Werror all-warnings
 LDFLAGS  := -v
 
 INCLUDE := -Iinclude/
