@@ -19,7 +19,7 @@ namespace img {
     };
 
 
-    using ColorFunc = Color (const kern::StateElem&);
+    using ColorFunc = Color (const kern::State::StateElem&);
     namespace color_funcs {
         ColorFunc sign_y;
     };
@@ -27,7 +27,7 @@ namespace img {
     using WriteFunc = void (
         std::ostream&,
         const kern::Params&,
-        const kern::State,
+        const kern::State&,
         const ColorFunc&);
     namespace write {
         WriteFunc pbm;

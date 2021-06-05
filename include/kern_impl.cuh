@@ -20,7 +20,7 @@ namespace kern {
             ~KernImpl();
 
             void compute(size_t iters);
-            std::unique_ptr<const State> getState() const;
+            State get_state() const;
 
         private:
 

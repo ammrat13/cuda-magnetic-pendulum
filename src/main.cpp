@@ -20,11 +20,11 @@ int main() {
     kern::Kern kernel{ params };
 
     kernel.compute(ITERS);
-    auto result = kernel.getState();
+    kern::State result = kernel.get_state();
 
 
     std::ofstream out;
     out.open(OUT_FILE_NAME, std::ios::out | std::ios::trunc);
 
-    img::write::pbm(out, params, result.get(), img::color_funcs::sign_y);
+    img::write::pbm(out, params, result, img::color_funcs::sign_y);
 }

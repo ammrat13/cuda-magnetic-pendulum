@@ -3,8 +3,8 @@
 
 #include <cstddef>
 #include <cstdint>
-
 #include <memory>
+#include <stdexcept>
 
 
 namespace kern {
@@ -25,11 +25,25 @@ namespace kern {
         size_t pixels() const { return this->resolution * this->resolution; };
     };
 
-    struct StateElem {
-        Vec2D pos;
-        Vec2D vel;
+
+    class State {
+        public:
+
+            struct StateElem {
+                Vec2D pos;
+                Vec2D vel;
+            };
+
+            const size_t resolution;
+
+            State(size_t res);
+            StateElem& operator() (size_t r, size_t c);
+            StateElem const& operator() (size_t r, size_t c) const;
+
+        private:
+            std::unique_ptr<StateElem[]> data;
+            void check_bounds(size_t r, size_t c) const;
     };
-    using State = StateElem[];
 
 
     class Kern {
@@ -39,7 +53,7 @@ namespace kern {
             ~Kern();
 
             void compute(size_t iters);
-            std::unique_ptr<const State> getState() const;
+            State get_state() const;
 
         private:
             class KernImpl;

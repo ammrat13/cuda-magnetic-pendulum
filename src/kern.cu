@@ -8,6 +8,6 @@ kern::Kern::~Kern() = default;
 void kern::Kern::compute(size_t iters) {
     this->kern_impl->compute(iters);
 }
-std::unique_ptr<const kern::State> kern::Kern::getState() const {
-    return this->kern_impl->getState();
+kern::State kern::Kern::get_state() const {
+    return this->kern_impl->get_state();
 }

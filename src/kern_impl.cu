@@ -24,19 +24,16 @@ kern::Kern::KernImpl::~KernImpl() {
 }
 
 
-std::unique_ptr<const kern::State> kern::Kern::KernImpl::getState() const {
+kern::State kern::Kern::KernImpl::get_state() const {
 
-    auto ret = std::make_unique<kern::State>(this->p.pixels());
+    kern::State ret(this->p.resolution);
 
     for(size_t r = 0; r < this->p.resolution; r++) {
         for(size_t c = 0; c < this->p.resolution; c++) {
             float4 cur = this->hos_state.data[
                 r * this->hos_state.pitch/sizeof(float4) + c
             ];
-            ret[r * this->p.resolution + c] = {
-                {cur.x, cur.y},
-                {cur.z, cur.w}
-            };
+            ret(r, c) = { {cur.x, cur.y}, {cur.z, cur.w} };
         }
     }
 
