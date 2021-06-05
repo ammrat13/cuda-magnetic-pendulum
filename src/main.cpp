@@ -4,7 +4,7 @@
 #include "img.h"
 
 const size_t RES   = 500;
-const size_t ITERS = 100;
+const size_t ITERS = 100000;
 const float H      = 0.002;
 
 const kern::Vec2D TOP_CORNER = {0.0, 1.0};
