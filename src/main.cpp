@@ -4,7 +4,7 @@
 #include "img.h"
 
 const size_t RES   = 500;
-const size_t ITERS = 10000;
+const size_t ITERS = 100;
 const float H      = 0.002;
 
 const kern::Vec2D TOP_CORNER = {0.0, 1.0};
@@ -17,7 +17,7 @@ int main() {
     kern::Kern kernel{ params };
 
     kernel.compute(ITERS);
-    std::unique_ptr<const kern::State> result = kernel.getState();
+    auto result = kernel.getState();
 
 
     std::ofstream out;

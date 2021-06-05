@@ -7,7 +7,7 @@ kern::Kern::KernImpl::KernImpl(kern::Params p): p{p}, first_call{true} {
     this->hos_state.pitch = this->p.resolution * sizeof(float4);
     this->hos_state.data = new float4[this->p.pixels()];
 
-    cudaError_t alloc_res = cudaMallocPitch(
+    auto alloc_res = cudaMallocPitch(
         &this->dev_state.data,
         &this->dev_state.pitch,
         this->p.resolution * sizeof(float4),
@@ -24,11 +24,9 @@ kern::Kern::KernImpl::~KernImpl() {
 }
 
 
-std::unique_ptr<const kern::StateElem[]> kern::Kern::KernImpl::getState() const {
+std::unique_ptr<const kern::State> kern::Kern::KernImpl::getState() const {
 
-    std::unique_ptr<kern::StateElem[]> ret(
-        new kern::StateElem[this->p.pixels()]
-    );
+    auto ret = std::make_unique<kern::State>(this->p.pixels());
 
     for(size_t r = 0; r < this->p.resolution; r++) {
         for(size_t c = 0; c < this->p.resolution; c++) {
@@ -63,7 +61,7 @@ void kern::Kern::KernImpl::compute(size_t iters) {
         this->first_call
     );
 
-    cudaError_t memcpy_res = cudaMemcpy2D(
+    auto memcpy_res = cudaMemcpy2D(
         this->hos_state.data,
         this->hos_state.pitch,
         this->dev_state.data,
