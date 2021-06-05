@@ -2,7 +2,6 @@
 #define IMG_H
 
 #include <cstdint>
-#include <fstream>
 
 #include "kern.h"
 

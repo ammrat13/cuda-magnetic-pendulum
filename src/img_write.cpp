@@ -1,5 +1,6 @@
 #include "img.h"
-#include <iostream>
+
+#include <ostream>
 
 
 void img::write::pbm(
