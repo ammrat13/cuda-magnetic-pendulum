@@ -55,32 +55,33 @@ __global__ void kern::gpu::compute_gpu(
     st.data[rowIdx * st.pitch/sizeof(float4) + colIdx] = state;
 }
 
-__device__ float4 kern::gpu::state_dt(float4 state) {
-    float4 top_inv_sq = kern::gpu::dts::inv_sq(1.5, 0.15, make_float2(0.0, 0.5), state);
-    float4 bot_inv_sq = kern::gpu::dts::inv_sq(1.5, 0.15, make_float2(0.0,-0.5), state);
-    float4 mid_spring = kern::gpu::dts::spring(0.5, make_float2(0.0, 0.0), state);
+__forceinline__ __device__ float4 kern::gpu::state_dt(float4 state) {
+    float2 top_inv_sq = kern::gpu::dts::inv_sq(1.5, 0.15, make_float2(0.0, 0.5), state);
+    float2 bot_inv_sq = kern::gpu::dts::inv_sq(1.5, 0.15, make_float2(0.0,-0.5), state);
+    float2 mid_spring = kern::gpu::dts::spring(0.5, make_float2(0.0, 0.0), state);
 
-    float4 frict_force = kern::gpu::dts::frict(0.1, state);
+    float2 frict_force = kern::gpu::dts::frict(0.1, state);
 
-    return make_float4(state.z, state.w, 0.0, 0.0)
-        + top_inv_sq
-        + bot_inv_sq
-        + mid_spring
-        + frict_force;
+    return make_float4(
+        state.z,
+        state.w,
+        top_inv_sq.x + bot_inv_sq.x + mid_spring.x + frict_force.x,
+        top_inv_sq.y + bot_inv_sq.y + mid_spring.y + frict_force.y
+    );
 }
 
 
-__device__ float4 kern::gpu::dts::inv_sq(float g, float off, float2 center, float4 state) {
+__forceinline__ __device__ float2 kern::gpu::dts::inv_sq(float g, float off, float2 center, float4 state) {
     float2 d = make_float2(state.x-center.x, state.y-center.y);
-    float mag = pow(d.x*d.x + d.y*d.y + off*off, -1.5);
-    return make_float4(0.0, 0.0, -g*mag*d.x, -g*mag*d.y);
+    float mag = powf(d.x*d.x + d.y*d.y + off*off, -1.5);
+    return make_float2(-g*mag*d.x, -g*mag*d.y);
 }
 
-__device__ float4 kern::gpu::dts::spring(float k, float2 center, float4 state) {
+__forceinline__ __device__ float2 kern::gpu::dts::spring(float k, float2 center, float4 state) {
     float2 d = make_float2(state.x-center.x, state.y-center.y);
-    return make_float4(0.0, 0.0, -k*d.x, -k*d.y);
+    return make_float2(-k*d.x, -k*d.y);
 }
 
-__device__ float4 kern::gpu::dts::frict(float m, float4 state) {
-    return make_float4(0.0, 0.0, -m*state.z, -m*state.w);
+__forceinline__ __device__ float2 kern::gpu::dts::frict(float m, float4 state) {
+    return make_float2(-m*state.z, -m*state.w);
 }

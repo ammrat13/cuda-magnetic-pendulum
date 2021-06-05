@@ -3,10 +3,10 @@ CXX  := g++
 NVCC := nvcc
 LD   := nvcc
 
-CFLAGS   := -v -g -O2
-CXXFLAGS := -v -g -O2
-NVCFLAGS := -v -g -G -O2
-LDFLAGS  := -v -g -G
+CFLAGS   := -v -O2
+CXXFLAGS := -v -O2
+NVCFLAGS := -v -O2
+LDFLAGS  := -v
 
 INCLUDE := -Iinclude/
 
